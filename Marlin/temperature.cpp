@@ -42,6 +42,7 @@ int target_temperature_bed = 0;
 int current_temperature_raw[EXTRUDERS] = { 0 };
 float current_temperature[EXTRUDERS] = { 0.0 };
 int current_temperature_bed_raw = 0;
+int raw_temp_bed_sample = 0;
 float current_temperature_bed = 0.0;
 #ifdef TEMP_SENSOR_1_AS_REDUNDANT
   int redundant_temperature_raw = 0;
@@ -1039,7 +1040,7 @@ ISR(TIMER0_COMPB_vect)
   static unsigned long raw_temp_1_value = 0;
   static unsigned long raw_temp_2_value = 0;
   static unsigned long raw_temp_bed_value = 0;
-  static unsigned char temp_state = 0;
+  static unsigned char temp_state = 8;
   static unsigned char pwm_count = (1 << SOFT_PWM_SCALE);
   static unsigned char soft_pwm_0;
   #if (EXTRUDERS > 1) || defined(HEATERS_PARALLEL)
@@ -1138,7 +1139,8 @@ ISR(TIMER0_COMPB_vect)
       break;
     case 3: // Measure TEMP_BED
       #if defined(TEMP_BED_PIN) && (TEMP_BED_PIN > -1)
-        raw_temp_bed_value += ADC;
+        raw_temp_bed_sample = ADC;
+        raw_temp_bed_value += raw_temp_bed_sample;
       #endif
       temp_state = 4;
       break;
@@ -1181,13 +1183,16 @@ ISR(TIMER0_COMPB_vect)
       temp_state = 0;
       temp_count++;
       break;
+    case 8: //Startup, delay initial temp reading a tiny bit so the hardware can settle.
+      temp_state = 0;
+      break;
 //    default:
 //      SERIAL_ERROR_START;
 //      SERIAL_ERRORLNPGM("Temp measurement error!");
 //      break;
   }
     
-  if(temp_count >= 16) // 8 ms * 16 = 128ms.
+  if(temp_count >= OVERSAMPLENR) // 8 * 16 * 1/(16000000/64/256)  = 131ms.
   {
     if (!temp_meas_ready) //Only update the raw values if they have been read. Else we could be updating them during reading.
     {
