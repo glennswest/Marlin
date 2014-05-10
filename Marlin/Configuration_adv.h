@@ -42,7 +42,7 @@
 
 //Show Temperature ADC value
 //The M105 command return, besides traditional information, the ADC value read from temperature sensors.
-#define SHOW_TEMP_ADC_VALUES
+//#define SHOW_TEMP_ADC_VALUES
 
 //  extruder run-out prevention.
 //if the machine is idle, and the temperature over MINTEMP, every couple of SECONDS some filament is extruded
@@ -215,11 +215,7 @@
 //homing hits the endstop, then retracts by this distance, before it tries to slowly bump again:
 #define X_HOME_RETRACT_MM 5
 #define Y_HOME_RETRACT_MM 5
-<<<<<<< HEAD
-#define Z_HOME_RETRACT_MM 5
-=======
 #define Z_HOME_RETRACT_MM 2
->>>>>>> upstream/Marlin_v1
 //#define QUICK_HOME  //if this is defined, if both x and y are to be homed, a diagonal move will be performed initially.
 
 #define AXIS_RELATIVE_MODES {false, false, false, false}
@@ -252,8 +248,7 @@
 #define DEFAULT_MINSEGMENTTIME        20000
 
 // If defined the movements slow down when the look ahead buffer is only half full
-// (don't use SLOWDOWN with DELTA because DELTA generates hundreds of segments per second)
-//#define SLOWDOWN
+#define SLOWDOWN
 
 // Frequency limit
 // See nophead's blog for more info
@@ -396,7 +391,7 @@ const unsigned int dropsegments=5; //everything with less than this number of st
 #if defined SDSUPPORT
   #define BLOCK_BUFFER_SIZE 16   // SD,LCD,Buttons take more memory, block buffer needs to be smaller
 #else
-  #define BLOCK_BUFFER_SIZE 64 // maximize block buffer
+  #define BLOCK_BUFFER_SIZE 16 // maximize block buffer
 #endif
 
 
